@@ -17,37 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class CartController {
 
-    private final UserSerivce userService;
     private final CartService cartService;
     private final ProductRepository productRepository;
-
-    // 장바구니
-    @GetMapping("/cart/{id}")
-    public String cartPage(@PathVariable("id") Long id, Model model, UserRequest userRequest, HttpSession httpSession) {
-        User user = userService.findUser(id);
-        Cart userCart = user.getCart();
-
-        if (userCart != null) {
-            if (user.getId().equals(id)) {
-                List<CartProduct> cartProductList = cartService.allUserCartView(userCart);
-
-                int totalPrice = 0;
-                for (CartProduct cartProduct : cartProductList) {
-                    totalPrice += cartProduct.getCount() * cartProduct.getProduct().getPrice();
-                }
-
-                model.addAttribute("totalPrice", totalPrice);
-                model.addAttribute("cartProducts", cartProductList);
-                httpSession.setAttribute("user", userService.findUser(id));
-
-                return "/product/cart";
-            } else {
-                return "redirect:/";
-            }
-        } else {
-            return "redirect:/";
-        }
-    }
 
     @PostMapping("/{userId}/cart/products")
     public ResponseEntity<Map<String, String>> addProductToCart(@PathVariable("userId") Long userId, @RequestBody CartRequest request) {
@@ -55,7 +26,7 @@ public class CartController {
         cartService.addProduct(userId, request);
 
         Product product = productRepository.findById(request.getProductId()).orElseThrow(() ->
-                new RuntimeException("등록되지 않은 상품입니다."));
+             new RuntimeException("등록되지 않은 상품입니다."));
 
         String description = String.format("%s가 %d개 장바구니에 추가되었습니다.", product.getName(), request.getQuantity());
         Map<String, String> response  = new HashMap<>();

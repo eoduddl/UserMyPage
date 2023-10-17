@@ -1,0 +1,88 @@
+drop database project02;
+
+create database project02;
+
+use project02;
+
+CREATE TABLE `user` (
+	`id` BIGINT	auto_increment primary key, #유저아이디
+    `name` varchar(10) not null, #이름
+	`email` varchar(45) NOT NULL, #이메일
+	`password` varchar(100) NOT NULL, #비밀번호
+	`phone` varchar(15) NOT NULL, #전화번호
+	`address` varchar(600), #주소
+	`gender` varchar(10), #성별
+	`status` varchar(45) NOT NULL	DEFAULT 'REGISTERED', #상태
+	`img` varchar(100) default 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png' #프로필사진
+);
+
+CREATE TABLE `user_profile` (
+	`id` BIGINT	NOT NULL, #유저아이디
+	`about_me` BIGINT, #소개글
+	`img` varchar(100), #프로필사진
+	`address` varchar(100), #주소
+    FOREIGN KEY (id) REFERENCES `user`(id)
+);
+
+CREATE TABLE `category` (
+	`category_id` BIGINT auto_increment primary KEY, #카테고리 고유번호
+	`category_name` VARCHAR(30) NOT NULL #카테고리명
+);
+
+CREATE TABLE `product` (
+	`product_id` BIGINT auto_increment primary KEY, #상품번호
+	`category_id` BIGINT NOT NULL, #카테고리 고유번호
+	`product_name` VARCHAR(20), #상품명
+	`price` double, #가격
+	`stock_quantity` Integer, #재고수량product
+	`register_date` TIMESTAMP NOT NULL default CURRENT_TIMESTAMP, #등록일
+	`field_predicted_sale_enddate` TIMESTAMP NOT NULL, #예상판매 종료날짜
+	`img1` VARCHAR(600), #이미지1
+	`img2` VARCHAR(600), #이미지2
+	`img3` VARCHAR(600), #이미지3
+	`click` int,
+    FOREIGN KEY (category_id) REFERENCES `category`(category_id)
+);
+
+CREATE TABLE `cart` (
+	`cart_id` BIGINT auto_increment primary KEY, #장바구니번호
+	`user_id` BIGINT NOT NULL, #유저번호
+	`total_count` int, #총 수량
+    `total_price` double, #총 가격
+    FOREIGN KEY (user_id) REFERENCES `user`(id)
+);
+
+CREATE TABLE `cart_product` (
+	`cart_product_id` BIGINT auto_increment primary KEY, #장바구니 상품번호
+	`cart_id` BIGINT NOT NULL, #장바구니 번호
+	`product_id` BIGINT NOT NULL, #상품번호
+	`amount` int, #수량
+	`price` double, #가격
+    FOREIGN KEY (product_id) REFERENCES product(product_id),
+	FOREIGN KEY (cart_id) REFERENCES cart(cart_id)
+);
+
+CREATE TABLE `orders` (
+	`order_id` BIGINT auto_increment primary KEY, #주문번호
+	`user_id` BIGINT NOT NULL , #유저아이디
+	`order_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, #주문일자
+	`order_status` VARCHAR(10), #주문상태
+    FOREIGN KEY (user_id) REFERENCES `user`(id)
+);
+
+CREATE TABLE `payment` (
+	`payment_id` BIGINT auto_increment primary key, #결제번호
+	`order_id` BIGINT NOT NULL, #주문번호
+	`address` varchar(100), #주소
+    FOREIGN KEY (order_id) REFERENCES `orders` (order_id)
+);
+
+CREATE TABLE `order_product` (
+	`order_detail_id` BIGINT auto_increment primary key, #주문상세번호
+	`order_id` BIGINT NOT NULL, #주문번호
+	`product_id` BIGINT NOT NULL, #상품번호
+	`count` int, #수량
+	`price` double, #가격
+    FOREIGN KEY (order_id) REFERENCES `orders`(order_id),
+	FOREIGN KEY (product_id) REFERENCES `product`(product_id)
+);

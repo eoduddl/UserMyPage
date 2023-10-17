@@ -24,24 +24,6 @@ public class UserService {
     UserConverter userConverter = new UserConverter();
     private final SmsCertificationService smsCertificationService;
 
-    @Transactional(readOnly = true)
-    public User findUser(Long id) {
-        User user = userRepository.findById(id).orElseGet(()->{
-            return new User();
-        });
-        return user;
-    }
-
-    public void userInfoModification(User user) {
-        User persistence =
-                userRepository.findById(user.getId()).orElseThrow(()->{
-                    return new IllegalArgumentException("회원 찾기 실패");
-                });
-        String email = user.getEmail();
-        String address = user.getAddress();
-        persistance.setEmail(email);
-        persistance.setAddress(address);
-    }
 
     public User findByEmail(String email) {
         var isUser = userRepository.findByEmail(email);

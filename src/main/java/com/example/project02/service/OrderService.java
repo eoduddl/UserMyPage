@@ -21,19 +21,12 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final OrderProductRepository orderProductRepository;
 
-    public List<OrderItem> findUserOrderProducts(Long userId) {
-        return orderProductRepository.findOrderProcudtsByUserId(userId);
-    }
-
-    public List<Order> findByUserId(Long id) {
-        return orderRepository.findOrdersByUserId(id);
-    }
 
     @Transactional
     public void order(Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new RuntimeException("조회되지 않는 회원"));
+            new RuntimeException("조회되지 않는 회원"));
 
         List<CartProduct> cartProducts = user.getCart().getCartProducts();
 
@@ -53,7 +46,7 @@ public class OrderService {
             orderRepository.save(order);
 
             Payment.createPayment(user, order);
-        }
+            }
 
         Cart cart = cartRepository.findByUserId(userId);
         cartRepository.delete(cart);
